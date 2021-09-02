@@ -25,6 +25,20 @@ class TestArgparse(unittest.TestCase):
             a.help_message,
         )
 
+    def test_no_help(self):
+        """Test help=False"""
+        a = ArgumentParser(description="UnitTest", help=False)
+        a.add_argument(Argument(name="test", description="Test Argument", required=True))
+
+        self.assertIsNone(a.help_message)
+
+    def test_required(self):
+        """Test required arguments"""
+        a = ArgumentParser(description="UnitTest")
+        a.add_argument(Argument(name="test", description="Test Argument", required=True))
+
+        self.assertRaises(ValueError, a.parse_args)
+
     def test_argv(self):
         a = ArgumentParser(description="UnitTest")
         a.add_argument(Argument(name="test", description="Test Argument"))
