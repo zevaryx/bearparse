@@ -16,7 +16,7 @@ tests:python39:
   script:
     - python -m pytest --cov=bearparse tests/
 
-tests:python310:
-  image: python:3.10
-  script:
-    - python -m pytest --cov=bearparse tests/
+# tests:python310:
+#   image: python:3.10
+#   script:
+#     - python -m pytest --cov=bearparse tests/
