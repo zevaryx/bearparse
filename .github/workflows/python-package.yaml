@@ -68,7 +68,7 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         name: codecov-umbrella
-  test_310:
+  test_38:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
