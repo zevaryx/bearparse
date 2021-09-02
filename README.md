@@ -17,4 +17,16 @@ To simplify
 
 ## Usage
 
-TODO
+```py
+from bearparse import Argument, ArgumentParser
+
+# Create the parser
+parser = ArgumentParser(description="Program Description")
+parser.add_argument(Argument(name="arg", description="First Argument"))
+parser.add_argument(Argument(name="arg2", description="Required Argument", required=True))
+
+# Parse from argv
+parser.parse_args()
+
+print(parser.parsed)
+```

@@ -6,7 +6,7 @@ from typing import Any, Callable, List, Optional, Type, Union
 import attr
 from attr.validators import instance_of
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 @attr.s(slots=True)
