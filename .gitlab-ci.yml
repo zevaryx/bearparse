@@ -9,4 +9,4 @@ before_script:
 
 tests:
   script:
-    - python -m pytest --cov=calculator tests/
+    - python -m pytest --cov=bearparse tests/
