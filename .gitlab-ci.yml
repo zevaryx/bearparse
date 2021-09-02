@@ -1,0 +1,22 @@
+cache:
+  paths:
+    - ~/.cache/pip/
+
+before_script:
+  - python -V
+  - python -m pip install --upgrade pytest pytest-cov
+
+tests:python38:
+  image: python:3.8
+  script:
+    - python -m pytest --cov=bearparse tests/
+
+tests:python39:
+  image: python:3.9
+  script:
+    - python -m pytest --cov=bearparse tests/
+
+tests:python310:
+  image: python:3.10
+  script:
+    - python -m pytest --cov=bearparse tests/
