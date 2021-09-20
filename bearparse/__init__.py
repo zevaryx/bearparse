@@ -1,12 +1,29 @@
+import json
 import re
+from enum import IntFlag
 from os import sep
+from pathlib import Path
 from sys import argv
 from typing import Any, Callable, List, Optional, Type, Union
 
 import attr
+import toml
+import yaml
 from attr.validators import instance_of
 
-__version__ = "0.1.1"
+try:
+    from yaml import CDumper as Dumper
+    from yaml import CLoader as Loader
+except ImportError:
+    from yaml import Dumper, Loader
+
+__version__ = "0.2.0"
+
+
+class FileType(IntFlag):
+    JSON = 1
+    YAML = 2
+    TOML = 3
 
 
 @attr.s(slots=True)
@@ -31,6 +48,10 @@ class Argument:
     def _validate_name(self, attribute, value) -> None:
         if not re.fullmatch(r"^[\w]{1,}$", value):
             raise ValueError(r"Argument name must match the pattern '^[\w]\{1,}$'")
+
+    def to_dict(self) -> dict:
+        return {"name": self.name, "description": self.description, "required": self.required,
+                "type": self.type}
 
 
 @attr.s()
@@ -68,6 +89,48 @@ class ArgumentParser:
         if not self._parsed:
             return None
         return self._parsed
+
+    def to_dict(self) -> dict:
+        data = {"description": self.description,
+                "format": self.format, "help": self.help, "arguments": []}
+        for arg in self.arguments:
+            data["arguments"].append(arg.to_dict())
+        return data
+
+    @classmethod
+    def from_file(cls, path: Union[Path, str], filetype: FileType) -> "ArgumentParser":
+        """Create an instance of ArgumentParser from a file.
+
+        :param path: File path
+        :param filetype: Type of file
+        """
+        if isinstance(path, str):
+            path = Path(path)
+        with path.open(encoding="utf8") as f:
+            raw = f.read()
+        if filetype == FileType.JSON:
+            data = json.loads(raw)
+        elif filetype == FileType.YAML:
+            data = yaml.load(raw, Loader=Loader)
+        elif filetype == FileType.TOML:
+            data = toml.loads(raw)
+        else:
+            raise ValueError("Invalid filetype")
+
+        return cls.from_dict(data)
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "ArgumentParser":
+        """Create an instance of ArgumentParser from a dict.
+
+        :param data: Data dictionary
+        """
+        args = data.pop("arguments")
+        parser = cls(**data)
+        for arg in args:
+            parser.add_argument(arg)
+
+        return parser
 
     def add_argument(self, arg: Union[Argument, dict]) -> None:
         """Add an argument to be parsed.

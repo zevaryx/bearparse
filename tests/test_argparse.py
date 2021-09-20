@@ -1,6 +1,16 @@
+import json
+import os
 import unittest
 
-from bearparse import Argument, ArgumentParser
+import toml
+import yaml
+
+try:
+    from yaml import CDumper as Dumper
+except ImportError:
+    from yaml import Loader
+
+from bearparse import Argument, ArgumentParser, FileType
 from bearparse.parsers import bool_parser
 
 
@@ -82,3 +92,38 @@ class TestArgparse(unittest.TestCase):
         """Test argument name checking"""
         self.assertRaises(ValueError, Argument, name="bad name")
         self.assertRaises(ValueError, Argument, name="bad-name")
+
+    def test_to_dict(self):
+        """Test ArgumentParser to_dict"""
+        a = ArgumentParser(description="UnitTest")
+        a.add_argument(Argument(name="test", description="Test Argument"))
+        a_dict = {
+            "description": "UnitTest",
+            "format": r"^([\w]{1,})=(.*)$",
+            "help": True,
+            "arguments": [{"name": "test", "description": "Test Argument", "required": False, "type": None}],
+        }
+
+        self.assertEqual(a.to_dict(), a_dict)
+
+    def test_from_dict(self):
+        """Test creating argparser from dict"""
+        data = {"description": "UnitTest", "arguments": [{"name": "test", "description": "Test Argument"}]}
+        _ = ArgumentParser.from_dict(data)
+
+    def test_from_file(self):
+        """Test creating argparser from file"""
+        data = {"description": "UnitTest", "arguments": [{"name": "test", "description": "Test Argument"}]}
+        with open("tmp.json", "w+") as f:
+            json.dump(data, f)
+        _ = ArgumentParser.from_file("tmp.json", FileType.JSON)
+        os.unlink("tmp.json")
+        with open("tmp.yaml", "w+") as f:
+            yaml.dump(data, f, Dumper=Dumper)
+        _ = ArgumentParser.from_file("tmp.yaml", FileType.YAML)
+        os.unlink("tmp.yaml")
+        with open("tmp.toml", "w+") as f:
+            toml.dump(data, f)
+        _ = ArgumentParser.from_file("tmp.toml", FileType.TOML)
+        self.assertRaises(ValueError, ArgumentParser.from_file, "tmp.toml", 4)
+        os.unlink("tmp.toml")
