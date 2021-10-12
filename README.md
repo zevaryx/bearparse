@@ -26,7 +26,7 @@ parser.add_argument(Argument(name="arg", description="First Argument"))
 parser.add_argument(Argument(name="arg2", description="Required Argument", required=True))
 
 # Parse from argv
-parser.parse_args()
+args = parser.parse_args()
 
-print(parser.parsed)
+print(args.parsed)
 ```

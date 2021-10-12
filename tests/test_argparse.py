@@ -6,9 +6,9 @@ import toml
 import yaml
 
 try:
-    from yaml import CDumper as Dumper
+    from yaml import CDumper as Dumper, CLoader as Loader
 except ImportError:
-    from yaml import Loader
+    from yaml import Dumper, Loader
 
 from bearparse import Argument, ArgumentParser, FileType
 from bearparse.parsers import bool_parser
@@ -25,9 +25,9 @@ class TestArgparse(unittest.TestCase):
 
         self.assertIsNone(a.parsed)
 
-        a.parse_args(["test=test"])
-        self.assertEqual("test", a.test)
-        self.assertIsNone(a.test2)
+        parsed = a.parse_args(["test=test"])
+        self.assertEqual("test", parsed.test)
+        self.assertIsNone(parsed.test2)
         self.assertEqual({"test": "test", "test2": None}, a.parsed)
         self.assertEqual(
             "UnitTest\nUsage: __main__.py test=<value> test2=<value>"
@@ -53,16 +53,16 @@ class TestArgparse(unittest.TestCase):
         a = ArgumentParser(description="UnitTest")
         a.add_argument(Argument(name="test", description="Test Argument"))
 
-        a.parse_args()
-        self.assertIsNone(a.test)
+        parsed = a.parse_args()
+        self.assertIsNone(parsed.test)
         self.assertEqual({"test": None}, a.parsed)
 
     def test_custom_format(self):
         a = ArgumentParser(description="UnitTest", format=r"^([\w]{1,})-(.*)$")
         a.add_argument(Argument(name="test", description="Test Argument"))
 
-        a.parse_args(["test-test"])
-        self.assertEqual("test", a.test)
+        parsed = a.parse_args(["test-test"])
+        self.assertEqual("test", parsed.test)
         self.assertEqual({"test": "test"}, a.parsed)
 
     # Test Argument
@@ -72,8 +72,8 @@ class TestArgparse(unittest.TestCase):
         a.add_argument(Argument(name="test", description="Test Argument", parser=bool_parser))
 
         for test in ["True", "true", "Yes", "yes", "T", "t", "Y", "y", True, 1]:
-            a.parse_args([f"test={test}"])
-            self.assertEqual(True, a.test)
+            parsed = a.parse_args([f"test={test}"])
+            self.assertEqual(True, parsed.test)
             self.assertEqual({"test": True}, a.parsed)
 
     def test_type_conversion(self):
@@ -82,10 +82,11 @@ class TestArgparse(unittest.TestCase):
         a.add_argument(Argument(name="test", description="Test Argument", type=bool, parser=bool_parser))
         a.add_argument(Argument(name="test2", description="Test Argument 2", type=int))
         a.add_argument(Argument(name="test3", description="Test Argument 3", type=float))
-        a.parse_args(["test=True", "test2=31", "test3=3.1"])
-        self.assertEqual(True, a.test)
-        self.assertEqual(31, a.test2)
-        self.assertEqual(3.1, a.test3)
+        parsed = a.parse_args(["test=True", "test2=31", "test3=3.1"])
+
+        self.assertEqual(True, parsed.test)
+        self.assertEqual(31, parsed.test2)
+        self.assertEqual(3.1, parsed.test3)
         self.assertEqual({"test": True, "test2": 31, "test3": 3.1}, a.parsed)
 
     def test_argument_name(self):

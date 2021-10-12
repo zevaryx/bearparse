@@ -50,8 +50,23 @@ class Argument:
             raise ValueError(r"Argument name must match the pattern '^[\w]\{1,}$'")
 
     def to_dict(self) -> dict:
-        return {"name": self.name, "description": self.description, "required": self.required,
-                "type": self.type}
+        return {"name": self.name, "description": self.description, "required": self.required, "type": self.type}
+
+
+class Args:
+    """An object with parsed arguments"""
+
+    def to_dict(self) -> dict:
+        return self.__dict__
+
+    def __getattr__(self, attr):
+        return self.__dict__.get(attr, None)
+
+    def __getitem__(self, key):
+        return self.__dict__.get(key, None)
+
+    def __setitem__(self, key, value):
+        self.__dict__[key] = value
 
 
 @attr.s()
@@ -91,8 +106,7 @@ class ArgumentParser:
         return self._parsed
 
     def to_dict(self) -> dict:
-        data = {"description": self.description,
-                "format": self.format, "help": self.help, "arguments": []}
+        data = {"description": self.description, "format": self.format, "help": self.help, "arguments": []}
         for arg in self.arguments:
             data["arguments"].append(arg.to_dict())
         return data
@@ -142,11 +156,10 @@ class ArgumentParser:
         self.arguments.append(arg)
         self._arg_lookup[arg.name] = arg
 
-    def parse_args(self, args: Optional[list] = None) -> dict:
-        parsed = {}
+    def parse_args(self, args: Optional[list] = None) -> Args:
+        parsed = Args()
         if not args:
             args = argv[1:]
-        print(args)
         for arg in args:
             match = re.match(self.format, arg)
             if match:
@@ -160,9 +173,10 @@ class ArgumentParser:
                     argument.value = value
                 parsed[name] = value
         for arg in self.arguments:
-            self.__setattr__(arg.name, arg.value)
-            if arg.name not in parsed:
+            if arg.name not in parsed.__dict__:
                 if arg.required:
                     raise ValueError(f"Missing required argument: {arg.name}")
-                parsed[arg.name] = arg.value
-        self._parsed = parsed
+                parsed[arg.name] = None
+        self._parsed = parsed.to_dict()
+
+        return parsed

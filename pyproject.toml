@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bearparse"
-version = "0.2.0"
+version = "0.3.0"
 description = "A custom argument parser for non-standard arguments. Useful for Appworx"
 authors = ["Zevaryx <zevaryx@gmail.com>"]
 license = "GPL-3.0-or-later"
@@ -8,6 +8,7 @@ license = "GPL-3.0-or-later"
 [tool.poetry.dependencies]
 python = "^3.8"
 attrs = "^21.2.0"
+PyYAML = "^5.4.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
