@@ -9,6 +9,7 @@ license = "GPL-3.0-or-later"
 python = "^3.8"
 attrs = "^21.2.0"
 PyYAML = "^5.4.1"
+toml = "^0.10.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
