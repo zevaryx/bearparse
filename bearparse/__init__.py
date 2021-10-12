@@ -12,12 +12,11 @@ import yaml
 from attr.validators import instance_of
 
 try:
-    from yaml import CDumper as Dumper
-    from yaml import CLoader as Loader
+    from yaml import CDumper as Dumper, CLoader as Loader
 except ImportError:
     from yaml import Dumper, Loader
 
-__version__ = "0.2.0"
+__version__ = "0.3.2"
 
 
 class FileType(IntFlag):
@@ -132,6 +131,23 @@ class ArgumentParser:
             raise ValueError("Invalid filetype")
 
         return cls.from_dict(data)
+
+    def to_file(self, path: Union[Path, str], filetype: FileType) -> None:
+        """Save an instance of ArgumentParser to a file
+
+        :param path: File path
+        :param filetype: Type of file
+        """
+        if isinstance(path, str):
+            path = Path(path)
+        with path.open("w+", encoding="utf8") as f:
+            data = self.to_dict()
+            if filetype == FileType.JSON:
+                data = json.dump(data, f, indent=4)
+            elif filetype == FileType.YAML:
+                data = yaml.dump(data, f, Dumper=Dumper)
+            elif filetype == FileType.TOML:
+                data = toml.dump(data, f)
 
     @classmethod
     def from_dict(cls, data: dict) -> "ArgumentParser":

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bearparse"
-version = "0.3.1"
+version = "0.3.2"
 description = "A custom argument parser for non-standard arguments. Useful for Appworx"
 authors = ["Zevaryx <zevaryx@gmail.com>"]
 license = "GPL-3.0-or-later"

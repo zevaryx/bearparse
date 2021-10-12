@@ -112,19 +112,34 @@ class TestArgparse(unittest.TestCase):
         data = {"description": "UnitTest", "arguments": [{"name": "test", "description": "Test Argument"}]}
         _ = ArgumentParser.from_dict(data)
 
+    def test_to_file(self):
+        """Test saving argparser to file"""
+        a = ArgumentParser(description="UnitTest")
+        a.add_argument(Argument(name="test", description="Test Argument", required=True))
+
+        a.to_file("tmp.json", FileType.JSON)
+        a.to_file("tmp.yaml", FileType.YAML)
+        a.to_file("tmp.toml", FileType.TOML)
+
+        os.unlink("tmp.json")
+        os.unlink("tmp.yaml")
+        os.unlink("tmp.toml")
+
     def test_from_file(self):
         """Test creating argparser from file"""
-        data = {"description": "UnitTest", "arguments": [{"name": "test", "description": "Test Argument"}]}
-        with open("tmp.json", "w+") as f:
-            json.dump(data, f)
+        a = ArgumentParser(description="UnitTest")
+        a.add_argument(Argument(name="test", description="Test Argument", required=True))
+
+        a.to_file("tmp.json", FileType.JSON)
         _ = ArgumentParser.from_file("tmp.json", FileType.JSON)
         os.unlink("tmp.json")
-        with open("tmp.yaml", "w+") as f:
-            yaml.dump(data, f, Dumper=Dumper)
+
+        a.to_file("tmp.yaml", FileType.YAML)
         _ = ArgumentParser.from_file("tmp.yaml", FileType.YAML)
         os.unlink("tmp.yaml")
-        with open("tmp.toml", "w+") as f:
-            toml.dump(data, f)
+
+        a.to_file("tmp.toml", FileType.TOML)
         _ = ArgumentParser.from_file("tmp.toml", FileType.TOML)
+
         self.assertRaises(ValueError, ArgumentParser.from_file, "tmp.toml", 4)
         os.unlink("tmp.toml")
