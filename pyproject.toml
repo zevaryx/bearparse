@@ -4,6 +4,7 @@ version = "0.3.0"
 description = "A custom argument parser for non-standard arguments. Useful for Appworx"
 authors = ["Zevaryx <zevaryx@gmail.com>"]
 license = "GPL-3.0-or-later"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.8"
