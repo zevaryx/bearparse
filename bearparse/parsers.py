@@ -1,7 +1,16 @@
 import re
+from typing import Any, Optional
 
 
-def bool_parser(value) -> bool:
+def bool_parser(value: Any) -> bool:
+    """Parse the value as a boolean.
+
+    Args:
+        value (Any): Value to parse as a boolean
+
+    Returns:
+        bool: Boolean result
+    """
     if isinstance(value, bool):
         return value
     elif isinstance(value, (int, float)):
@@ -16,7 +25,15 @@ def bool_parser(value) -> bool:
             return False
 
 
-def float_parser(value) -> float:
+def float_parser(value: Any) -> Optional[float]:
+    """Parse the value as a float.
+
+    Args:
+        value (Any): Value to parse as a float
+
+    Returns:
+        float | None: Float result, or None if value is not a float
+    """
     if isinstance(value, (int, float)):
         return value
     elif isinstance(value, str):
@@ -28,7 +45,15 @@ def float_parser(value) -> float:
         return None
 
 
-def int_parser(value) -> int:
+def int_parser(value: Any) -> Optional[int]:
+    """Parse the value as a int.
+
+    Args:
+        value (Any): Value to parse as a int
+
+    Returns:
+        int | None: Int result, or None if value is not a int
+    """
     value = float_parser(value)
     if value:
         value = int(value)

@@ -20,6 +20,8 @@ __version__ = "0.3.2"
 
 
 class FileType(IntFlag):
+    """FileType flag for reading/writing ArgumentParser files."""
+
     JSON = 1
     YAML = 2
     TOML = 3
@@ -29,12 +31,13 @@ class FileType(IntFlag):
 class Argument:
     r"""An argument to be parsed.
 
-    :param name: Name of the argument, must match `^[\w]\{1,}$`
-    :param description: Argument description
-    :param required: If the argument is required
-    :param value: Value of the argument
-    :param type: Type of the argument
-    :param parser: Custom parser function
+    Attributes:
+        name (str): Name of the argument, must match ``^[\w]\{1,}$``
+        description (str): Argument description
+        required (bool): If the argument is required, default ``False``
+        value (Any): Value of the argument
+        type (Type): Type of the argument
+        parser (Callable): Custom parser function
     """
     name: str = attr.ib(validator=instance_of(str))
     description: Optional[str] = attr.ib(default=None, validator=instance_of(str))
@@ -49,6 +52,7 @@ class Argument:
             raise ValueError(r"Argument name must match the pattern '^[\w]\{1,}$'")
 
     def to_dict(self) -> dict:
+        """Get the argument as a dict."""
         return {"name": self.name, "description": self.description, "required": self.required, "type": self.type}
 
 
@@ -72,10 +76,11 @@ class Args:
 class ArgumentParser:
     r"""Custom ArgumentParser for non-standard argument passing.
 
-    :param description: Program description
-    :param arguments: Arguments to be parsed
-    :param format: Custom argument format, default `^([\w]{1,})=(.*)$`
-    :param help: If help string should be generated
+    Attributes:
+        description (str): Program description
+        arguments (List[Argument]): Arguments to be parsed
+        format (str): Custom argument format, default ``^([\w]{1,})=(.*)$``
+        help (bool): If help string should be generated, default ``True``
     """
     description: Optional[str] = attr.ib(default=None)
     arguments: Optional[List[Argument]] = attr.ib(factory=list)
@@ -114,8 +119,15 @@ class ArgumentParser:
     def from_file(cls, path: Union[Path, str], filetype: FileType) -> "ArgumentParser":
         """Create an instance of ArgumentParser from a file.
 
-        :param path: File path
-        :param filetype: Type of file
+        Args:
+            path (Path | str): File path
+            filetype (FileType): Type of file
+
+        Returns:
+            ArgumentParser: ArgumentParser created from file
+
+        Raises:
+            ValueError: An invalid FileType was passed in
         """
         if isinstance(path, str):
             path = Path(path)
@@ -135,8 +147,9 @@ class ArgumentParser:
     def to_file(self, path: Union[Path, str], filetype: FileType) -> None:
         """Save an instance of ArgumentParser to a file
 
-        :param path: File path
-        :param filetype: Type of file
+        Args:
+            path (Path | str): File path
+            filetype (FileType): Type of file
         """
         if isinstance(path, str):
             path = Path(path)
@@ -153,7 +166,8 @@ class ArgumentParser:
     def from_dict(cls, data: dict) -> "ArgumentParser":
         """Create an instance of ArgumentParser from a dict.
 
-        :param data: Data dictionary
+        Args:
+            data (dict): Data dictionary
         """
         args = data.pop("arguments")
         parser = cls(**data)
@@ -165,7 +179,8 @@ class ArgumentParser:
     def add_argument(self, arg: Union[Argument, dict]) -> None:
         """Add an argument to be parsed.
 
-        :param arg: Argument/dict to parse
+        Args:
+            arg (Argument | dict): Argument/dict to parse
         """
         if isinstance(arg, dict):
             arg = Argument(**arg)
