@@ -63,3 +63,5 @@ html_static_path = ["_static"]
 
 # Custom config
 autodoc_default_flags = ["members"]
+master_doc = "index"
+source_suffix = [".rst", ".md"]
